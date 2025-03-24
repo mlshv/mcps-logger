@@ -9,6 +9,13 @@ console.log for your stdio MCP server
 
 When developing an MCP (Model Context Protocol) server with stdio transport, console.log interferes with the protocol communication.
 
+For example, this is what you normally get in MCP inspector `npx @modelcontextprotocol/inspector` when calling `console.log` in your MCP server code:
+```
+Error from MCP server: SyntaxError: Unexpected token S in JSON at position 0
+```
+
+## Solution
+
 This package patches the console methods (log, warn, error, debug) and redirects logs to a separate terminal.
 
 https://github.com/user-attachments/assets/33ff367e-74b4-48e8-9f04-0bcafbad5e00
