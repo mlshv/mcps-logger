@@ -11,6 +11,8 @@ When developing an MCP (Model Context Protocol) server with stdio transport, con
 
 This package patches the console methods (log, warn, error, debug) and redirects logs to a separate terminal.
 
+https://github.com/user-attachments/assets/33ff367e-74b4-48e8-9f04-0bcafbad5e00
+
 ## Usage
 
 Start the logger in a terminal where you want to see the logs:
