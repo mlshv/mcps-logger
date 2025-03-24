@@ -133,6 +133,9 @@ export function initConsoleLogger({
   return cleanupFunction;
 }
 
-if (require.main === module) {
+// Check if file is being executed directly
+const isDirectExecution = process.argv[1] === __filename;
+
+if (isDirectExecution) {
   initConsoleLogger();
 }
