@@ -1,1 +1,1 @@
-export { initConsoleLogger } from "./console";
+export { initConsoleLogger } from "./client";
