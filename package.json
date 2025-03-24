@@ -1,13 +1,13 @@
 {
   "name": "mcps-logger",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0-rc.2",
   "description": "",
   "scripts": {
     "build": "tsc",
     "prepare": "npm run build"
   },
   "bin": {
-    "mcps-logger": "./dist/logger-server.js"
+    "mcps-logger": "./dist/server.js"
   },
   "files": [
     "dist/**/*",
@@ -15,9 +15,9 @@
     "README.md"
   ],
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+    "./console": {
+      "types": "./dist/console.d.ts",
+      "default": "./dist/console.js"
     }
   },
   "keywords": [

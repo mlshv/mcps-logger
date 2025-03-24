@@ -5,33 +5,34 @@ console.log for your stdio MCP server
 [![npm version](https://img.shields.io/npm/v/mcps-logger.svg)](https://www.npmjs.com/package/mcps-logger)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-When developing an MCP (Model Context Protocol) server that uses stdio transport, console.log statements interfere with the protocol communication. This package redirects logs to a separate terminal window through a TCP connection. It patches the console methods (log, warn, error, debug), allowing you to maintain your existing logging code while keeping the stdio channel clean for MCP communication.
+## Why?
+
+When developing an MCP (Model Context Protocol) server with stdio transport, console.log interferes with the protocol communication.
+
+This package patches the console methods (log, warn, error, debug) and redirects logs to a separate terminal.
 
 ## Usage
 
-### 1. Install the logger in your MCP server
+Start the logger in a terminal where you want to see the logs:
+```shell
+npx mcps-logger
+```
+
+Install the logger in your MCP server:
 ```shell
 npm install mcps-logger
 ```
 
+Add it to your MCP server entry file:
 ```typescript
-// in your MCP server entry file
-import { initConsoleLogger } from "mcps-logger";
-
-initConsoleLogger();
+import "mcps-logger/console";
 ```
 
 Or if you want to use in development mode only:
 
 ```typescript
 if (process.env.NODE_ENV !== "production") {
-    import("mcps-logger").then(({ initConsoleLogger }) => {
-        initConsoleLogger();
-    });
+    import("mcps-logger/console");
 }
 ```
 
-### 2. Start the logger to receive logs from MCP server
-```shell
-npx mcps-logger
-```

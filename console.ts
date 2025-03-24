@@ -1,7 +1,5 @@
 import net from "node:net";
 
-const port = Number(process.env.MCPS_LOGGER_PORT) || 8099;
-const MAX_RECONNECT_ATTEMPTS = 5;
 const RECONNECT_INTERVAL = 2000;
 
 interface LogEntry {
@@ -12,14 +10,17 @@ interface LogEntry {
 let isLoggerInitialized = false;
 let cleanupFunction: (() => void) | null = null;
 
-export function initConsoleLogger() {
+export function initConsoleLogger({
+  port = 8099,
+}: {
+  port?: number;
+} = {}) {
   if (isLoggerInitialized && cleanupFunction) {
     return cleanupFunction;
   }
 
   isLoggerInitialized = true;
   let socket: net.Socket | null = null;
-  let reconnectAttempts = 0;
   const messageQueue: LogEntry[] = [];
   let connected = false;
 
@@ -35,7 +36,6 @@ export function initConsoleLogger() {
 
     socket.connect(port, "localhost", () => {
       connected = true;
-      reconnectAttempts = 0;
 
       while (messageQueue.length > 0) {
         const msg = messageQueue.shift();
@@ -47,11 +47,7 @@ export function initConsoleLogger() {
       connected = false;
       socket = null;
 
-      if (
-        err.message.includes("ECONNREFUSED") &&
-        reconnectAttempts < MAX_RECONNECT_ATTEMPTS
-      ) {
-        reconnectAttempts++;
+      if (err.message.includes("ECONNREFUSED")) {
         setTimeout(connectToServer, RECONNECT_INTERVAL);
       } else {
         originalConsole.error(
@@ -59,12 +55,14 @@ export function initConsoleLogger() {
           "Failed to connect to debug server:",
           err.message
         );
+        setTimeout(connectToServer, RECONNECT_INTERVAL);
       }
     });
 
     socket.on("close", () => {
       connected = false;
       socket = null;
+      setTimeout(connectToServer, RECONNECT_INTERVAL);
     });
   }
 
@@ -133,4 +131,8 @@ export function initConsoleLogger() {
   };
 
   return cleanupFunction;
+}
+
+if (require.main === module) {
+  initConsoleLogger();
 }
