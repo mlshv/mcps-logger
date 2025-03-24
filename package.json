@@ -1,0 +1,39 @@
+{
+  "name": "mcps-logger",
+  "version": "1.0.0-rc.1",
+  "description": "",
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build"
+  },
+  "bin": {
+    "mcps-logger": "./dist/logger-server.js"
+  },
+  "files": [
+    "dist/**/*",
+    "LICENSE",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "keywords": [
+    "MCP",
+    "Model Context Protocol",
+    "Logger"
+  ],
+  "homepage": "https://github.com/mlshv/mcps-logger",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mlshv/mcps-logger.git"
+  },
+  "author": "Misha Malyshev",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.13.13",
+    "typescript": "^5.8.2"
+  }
+}
