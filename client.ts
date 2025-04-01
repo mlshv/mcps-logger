@@ -23,6 +23,7 @@ export function initConsoleLogger({
   let socket: net.Socket | null = null;
   const messageQueue: LogEntry[] = [];
   let connected = false;
+  let reconnectTimeout: NodeJS.Timeout | null = null;
 
   const originalConsole = {
     log: console.log,
@@ -32,6 +33,12 @@ export function initConsoleLogger({
   };
 
   function connectToServer() {
+    // Clear any existing socket
+    if (socket) {
+      socket.removeAllListeners();
+      socket.destroy();
+    }
+
     socket = new net.Socket();
 
     socket.connect(port, "localhost", () => {
@@ -45,32 +52,46 @@ export function initConsoleLogger({
 
     socket.on("error", (err) => {
       connected = false;
-      socket = null;
-
+      
       if (err.message.includes("ECONNREFUSED")) {
-        setTimeout(connectToServer, RECONNECT_INTERVAL);
+        scheduleReconnect();
       } else {
         originalConsole.error(
           "\x1b[31m%s\x1b[0m",
           "Failed to connect to debug server:",
           err.message
         );
-        setTimeout(connectToServer, RECONNECT_INTERVAL);
+        scheduleReconnect();
       }
     });
 
     socket.on("close", () => {
       connected = false;
-      socket = null;
-      setTimeout(connectToServer, RECONNECT_INTERVAL);
+      scheduleReconnect();
     });
+  }
+
+  function scheduleReconnect() {
+    // Clear any existing reconnect timeout
+    if (reconnectTimeout) {
+      clearTimeout(reconnectTimeout);
+      reconnectTimeout = null;
+    }
+    
+    // Only schedule a reconnect if we're still initialized
+    if (isLoggerInitialized) {
+      reconnectTimeout = setTimeout(connectToServer, RECONNECT_INTERVAL);
+    }
   }
 
   function sendToServer(entry: LogEntry) {
     if (connected && socket) {
       socket.write(`${JSON.stringify(entry)}\n`);
     } else {
-      messageQueue.push(entry);
+      // Cap the queue size to prevent memory issues
+      if (messageQueue.length < 1000) {
+        messageQueue.push(entry);
+      }
     }
   }
 
@@ -121,12 +142,27 @@ export function initConsoleLogger({
   connectToServer();
 
   cleanupFunction = () => {
-    if (socket) socket.end();
+    isLoggerInitialized = false;
+    
+    // Clear reconnect timeout
+    if (reconnectTimeout) {
+      clearTimeout(reconnectTimeout);
+      reconnectTimeout = null;
+    }
+    
+    // Clean up socket
+    if (socket) {
+      socket.removeAllListeners();
+      socket.destroy();
+      socket = null;
+    }
+    
+    // Restore original console methods
     console.log = originalConsole.log;
     console.warn = originalConsole.warn;
     console.error = originalConsole.error;
     console.debug = originalConsole.debug;
-    isLoggerInitialized = false;
+    
     cleanupFunction = null;
   };
 

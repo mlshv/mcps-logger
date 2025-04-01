@@ -1,10 +1,11 @@
 {
   "name": "mcps-logger",
-  "version": "1.0.0-rc.4",
+  "version": "1.0.0",
   "description": "console.log for your stdio MCP server",
   "scripts": {
     "build": "tsc",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "test": "vitest"
   },
   "bin": {
     "mcps-logger": "./dist/server.js"
@@ -38,6 +39,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^22.13.13",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "vitest": "^3.1.1"
   }
 }
